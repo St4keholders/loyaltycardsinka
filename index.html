@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ceviche Inka Miami | Loyalty Cards</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --gold:        #C9A84C;
+      --gold-light:  #E8C96B;
+      --gold-dim:    #8B6914;
+      --gold-glow:   rgba(201,168,76,0.18);
+      --gold-glow2:  rgba(201,168,76,0.08);
+      --ink:         #080808;
+      --ink-card:    #0E0E0E;
+      --ink-panel:   #141414;
+      --ink-raised:  #1A1A1A;
+      --border:      rgba(201,168,76,0.15);
+      --border-dim:  rgba(255,255,255,0.06);
+      --text:        #E8E0D0;
+      --text-muted:  #8A8070;
+      --serif:       'Cormorant Garamond', Georgia, serif;
+      --sans:        'DM Sans', system-ui, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--ink);
+      font-family: var(--sans);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ── Grain overlay ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.45;
+    }
+
+    .container {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── HERO full-bleed ── */
+    .hero {
+      position: relative;
+      width: 100vw;
+      left: 50%;
+      right: 50%;
+      margin-left: -50vw;
+      margin-right: -50vw;
+      overflow: hidden;
+      max-height: 92vh;
+    }
+    .hero img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      transition: transform 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .hero:hover img { transform: scale(1.02); }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, transparent 55%, rgba(8,8,8,0.72) 100%);
+      pointer-events: none;
+    }
+
+    /* ── SECTION TITLE ── */
+    .section-title {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    .section-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.8rem;
+    }
+    .section-title h2 {
+      font-family: var(--serif);
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 300;
+      letter-spacing: 0.04em;
+    }
+    .ornament {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.8rem;
+      margin-top: 1rem;
+    }
+    .ornament span { color: var(--gold); font-size: 0.55rem; letter-spacing: 0.3em; }
+    .ornament::before, .ornament::after {
+      content: '';
+      width: 50px;
+      height: 1px;
+      background: var(--gold);
+      opacity: 0.4;
+    }
+
+    /* ── CARDS COMPARISON ── */
+    .cards-comparison {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2rem;
+      margin: 2rem 0 3rem;
+    }
+    .card-item {
+      background: var(--ink-card);
+      border-radius: 28px;
+      border: 1px solid var(--border-dim);
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      position: relative;
+    }
+    .card-item::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 28px;
+      background: linear-gradient(135deg, var(--gold-glow2), transparent 60%);
+      opacity: 0;
+      transition: opacity 0.4s;
+      pointer-events: none;
+    }
+    .card-item:hover {
+      border-color: var(--border);
+      box-shadow: 0 24px 48px -12px rgba(0,0,0,0.7), 0 0 40px -10px var(--gold-glow);
+      transform: translateY(-6px);
+    }
+    .card-item:hover::before { opacity: 1; }
+
+    /* Image block — proxy via thumbnail API para Drive */
+    .card-img {
+      background: #0A0A0A;
+      padding: 1.8rem 1.8rem 1rem;
+      text-align: center;
+      position: relative;
+    }
+    .card-img::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 40px;
+      background: linear-gradient(to bottom, transparent, var(--ink-card));
+    }
+    .card-img img {
+      width: 100%;
+      max-width: 420px;
+      height: auto;
+      border-radius: 16px;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.6);
+      display: block;
+      margin: 0 auto;
+    }
+    /* Fallback placeholder when image fails */
+    .card-img img[data-error="true"] {
+      min-height: 200px;
+      background: var(--ink-raised);
+    }
+
+    .card-content { padding: 1.6rem 1.8rem 1.8rem; }
+
+    .card-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      background: rgba(201,168,76,0.1);
+      border: 1px solid rgba(201,168,76,0.25);
+      color: var(--gold);
+      border-radius: 40px;
+      padding: 0.3rem 1rem;
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+    .card-content p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+    .card-content p strong { color: var(--text); }
+
+    .milestone-list { margin: 1rem 0; }
+    .milestone-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold-dim);
+      margin-bottom: 0.7rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .milestone-label i { color: var(--gold); }
+    .chips-row { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.6rem; }
+    .reward-chip {
+      background: linear-gradient(135deg, rgba(201,168,76,0.12), rgba(0,0,0,0.3));
+      border: 1px solid rgba(201,168,76,0.3);
+      border-radius: 30px;
+      padding: 0.3rem 0.9rem;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    .info-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.7rem;
+      font-size: 0.85rem;
+      margin-top: 0.75rem;
+      line-height: 1.5;
+      color: var(--text-muted);
+    }
+    .info-row i { color: var(--gold); width: 18px; flex-shrink: 0; margin-top: 2px; }
+    .info-row strong { color: var(--text); }
+
+    .disadvantage {
+      margin-top: 1.2rem;
+      padding: 1rem;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.02);
+      border: 1px dashed rgba(255,255,255,0.08);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+    .disadvantage i { color: var(--gold-dim); margin-right: 0.4rem; }
+    .disadvantage strong { color: var(--text-muted); }
+
+    /* ── QUICK COMPARE ── */
+    .quick-compare {
+      background: var(--ink-panel);
+      border-radius: 24px;
+      border: 1px solid var(--border-dim);
+      padding: 2rem;
+      margin: 0 0 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .quick-compare::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, var(--gold-glow), transparent 70%);
+      pointer-events: none;
+    }
+    .compare-title {
+      font-family: var(--serif);
+      font-size: 1.4rem;
+      font-weight: 400;
+      color: var(--gold);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+    }
+    .compare-row {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 1rem;
+      border-bottom: 1px solid var(--border-dim);
+      padding: 0.9rem 0;
+      align-items: start;
+    }
+    .compare-row:last-child { border-bottom: none; }
+    .compare-feature {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--gold);
+      padding-top: 1px;
+    }
+    .compare-value {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* ── RECORRIDO / ACCORDIONS ── */
+    .journey-section { margin-bottom: 4rem; }
+    .journey-header {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin-bottom: 1.5rem;
+    }
+    .journey-header h3 {
+      font-family: var(--serif);
+      font-size: 1.5rem;
+      font-weight: 400;
+      color: var(--gold);
+    }
+    .journey-header i { color: var(--gold); font-size: 1.1rem; }
+
+    .steps-wrapper { display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 1.5rem; }
+
+    .step-accordion {
+      background: var(--ink-card);
+      border-radius: 16px;
+      border: 1px solid var(--border-dim);
+      border-left: 3px solid var(--gold-dim);
+      overflow: hidden;
+      transition: border-color 0.3s;
+    }
+    .step-accordion:hover, .step-accordion.active {
+      border-left-color: var(--gold);
+      border-color: var(--border);
+    }
+    .step-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.3rem;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      background: var(--ink-card);
+      transition: background 0.2s;
+      user-select: none;
+    }
+    .step-header:hover { background: var(--ink-raised); }
+    .step-header i {
+      color: var(--gold);
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+    .step-accordion.active .step-header i { transform: rotate(180deg); }
+
+    .step-content {
+      max-height: 0;
+      padding: 0 1.3rem;
+      overflow: hidden;
+      transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), padding 0.25s;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      border-top: 1px solid transparent;
+      background: rgba(0,0,0,0.2);
+    }
+    .step-accordion.active .step-content {
+      max-height: 400px;
+      padding: 1rem 1.3rem 1.3rem;
+      border-top-color: var(--border-dim);
+    }
+
+    /* ── PUSH NOTIFICATIONS ── */
+    .push-demo { display: flex; flex-wrap: wrap; gap: 0.8rem; }
+    .push-card {
+      background: var(--ink-raised);
+      border-radius: 40px;
+      padding: 0.55rem 1.1rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      border: 1px solid var(--border-dim);
+      animation: ringGold 3s ease-in-out infinite;
+    }
+    .push-card i { color: var(--gold); }
+    @keyframes ringGold {
+      0%,100% { border-color: var(--border-dim); box-shadow: none; }
+      50%      { border-color: rgba(201,168,76,0.4); box-shadow: 0 0 0 3px rgba(201,168,76,0.08); }
+    }
+    .push-card:nth-child(2) { animation-delay: 0.8s; }
+    .push-card:nth-child(3) { animation-delay: 1.6s; }
+
+    /* ── DIVIDER ── */
+    .section-divider {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin: 3.5rem 0;
+      opacity: 0.3;
+    }
+    .section-divider::before, .section-divider::after {
+      content: ''; flex: 1; height: 1px; background: var(--gold);
+    }
+    .section-divider span { color: var(--gold); font-size: 0.5rem; letter-spacing: 0.4em; }
+
+    /* ── CTA ── */
+    .cta-section {
+      text-align: center;
+      background: radial-gradient(ellipse at 50% 0%, rgba(201,168,76,0.07) 0%, transparent 70%),
+                  var(--ink-panel);
+      border-radius: 32px;
+      border: 1px solid var(--border);
+      padding: 3rem 2rem;
+      margin-bottom: 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-section::before {
+      content: '✦';
+      position: absolute;
+      top: 1.5rem; left: 50%; transform: translateX(-50%);
+      color: var(--gold);
+      font-size: 0.8rem;
+      opacity: 0.4;
+    }
+    .cta-section h3 {
+      font-family: var(--serif);
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 300;
+      letter-spacing: 0.04em;
+      color: var(--text);
+      margin-top: 0.5rem;
+    }
+    .cta-section h3 em { font-style: italic; color: var(--gold); }
+    .cta-section p { color: var(--text-muted); margin: 0.8rem 0; font-size: 0.9rem; }
+    .cta-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1.2rem;
+      margin-top: 2rem;
+    }
+
+    .btn-gold {
+      background: linear-gradient(135deg, var(--gold-light), var(--gold));
+      color: var(--ink);
+      font-family: var(--sans);
+      font-weight: 600;
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+      padding: 0.85rem 2rem;
+      border-radius: 48px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      box-shadow: 0 4px 16px rgba(201,168,76,0.25);
+      min-width: 220px;
+      justify-content: center;
+    }
+    .btn-gold:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 12px 32px rgba(201,168,76,0.4);
+    }
+    .cta-note {
+      margin-top: 1.2rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      opacity: 0.7;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 2.5rem 0 3rem;
+      border-top: 1px solid var(--border-dim);
+    }
+    .footer-brand {
+      font-family: var(--serif);
+      font-size: 1.2rem;
+      font-weight: 300;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .footer-brand em { font-style: italic; color: var(--gold); }
+    .footer-sub {
+      margin-top: 0.5rem;
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      opacity: 0.4;
+    }
+
+    /* ── SCROLL REVEAL ── */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.75s ease, transform 0.75s ease;
+    }
+    .fade-up.revealed { opacity: 1; transform: translateY(0); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 700px) {
+      .compare-row { grid-template-columns: 1fr; gap: 0.3rem; }
+      .cta-buttons a { width: 100%; }
+      .journey-header h3 { font-size: 1.2rem; }
+    }
+    @media (max-width: 500px) {
+      .cards-comparison { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HERO full-bleed -->
+<section class="hero fade-up">
+  <img
+    src="https://lh3.googleusercontent.com/d/1nSXlJPweOWKIAK58CZECJQvLgGVncUYU"
+    alt="Ceviche Inka Miami"
+    onerror="this.onerror=null; this.src='https://drive.google.com/thumbnail?id=1nSXlJPweOWKIAK58CZECJQvLgGVncUYU&sz=w1600';"
+  >
+  <div class="hero-overlay"></div>
+</section>
+
+<div class="container">
+
+  <div class="section-divider fade-up" style="transition-delay:0.15s"><span>· · ·</span></div>
+
+  <!-- SECCIÓN: TARJETAS -->
+  <div class="section-title fade-up" style="transition-delay:0.2s">
+    <p class="section-label">Nuestros programas</p>
+    <h2>Elige tu camino dorado</h2>
+    <div class="ornament"><span>◆ ◆ ◆</span></div>
+  </div>
+
+  <div class="cards-comparison fade-up" style="transition-delay:0.25s">
+
+    <!-- Tarjeta 1: Inka Gold (Sellos) -->
+    <div class="card-item">
+      <div class="card-img">
+        <img
+          src="https://lh3.googleusercontent.com/d/1vne2dfTZ7Q1lGxaoaBOC6r6ZC4zw_LxL"
+          alt="Inka Gold — Loyalty Card Sellos"
+          onerror="this.onerror=null; this.src='https://drive.google.com/thumbnail?id=1vne2dfTZ7Q1lGxaoaBOC6r6ZC4zw_LxL&sz=w800';"
+        >
+      </div>
+      <div class="card-content">
+        <span class="card-badge"><i class="fas fa-stamp"></i> Inka Gold · Sellos</span>
+        <p><strong>$1 gastado = 1 sello</strong> · Sello extra por reseña / post (acción mesero)</p>
+
+        <div class="milestone-list">
+          <div class="milestone-label"><i class="fas fa-gift"></i> Milestones</div>
+          <div class="chips-row">
+            <span class="reward-chip">Sello 1 → Bebida bienvenida</span>
+            <span class="reward-chip">Sello 5 → Entrada gratis</span>
+            <span class="reward-chip">Sello 8 → Postre gratis</span>
+            <span class="reward-chip">Sello 10 → Ceviche Clásico</span>
+          </div>
+        </div>
+
+        <div class="info-row"><i class="fas fa-bell"></i><div><strong>Push automáticos:</strong> Sello 4, Sello 7, 21 días sin visita → 20 pts bonus</div></div>
+        <div class="info-row"><i class="fas fa-infinity"></i><div><strong>Vencimiento:</strong> Ilimitado (tarjeta y sellos)</div></div>
+
+        <div class="disadvantage">
+          <i class="fas fa-exclamation-triangle"></i>
+          <strong>Consideraciones:</strong> Recompensas intermedias (sello 1, 5, 8) requieren acción manual del mesero; solo la reward de sello 10 es automática. Dependencia del equipo para sellos por redes.
+        </div>
+      </div>
+    </div>
+
+    <!-- Tarjeta 2: Inka Points (Puntos) -->
+    <div class="card-item">
+      <div class="card-img">
+        <img
+          src="https://lh3.googleusercontent.com/d/15OPrmheAs5blCA_NkaWJAAJFkrsDM_BG"
+          alt="Inka Points — Loyalty Card Puntos"
+          onerror="this.onerror=null; this.src='https://drive.google.com/thumbnail?id=15OPrmheAs5blCA_NkaWJAAJFkrsDM_BG&sz=w800';"
+        >
+      </div>
+      <div class="card-content">
+        <span class="card-badge"><i class="fas fa-coins"></i> Inka Points · Puntos</span>
+        <p><strong>$1 gastado = 1 punto</strong> · Lunch 2×, Buffet fin de semana 3× puntos</p>
+
+        <div class="milestone-list">
+          <div class="milestone-label"><i class="fas fa-exchange-alt"></i> Canjes</div>
+          <div class="chips-row">
+            <span class="reward-chip">150 pts → $5 dto</span>
+            <span class="reward-chip">300 pts → Entrada a elección</span>
+            <span class="reward-chip">500 pts → Ceviche Clásico</span>
+            <span class="reward-chip">900 pts → Buffet gratis</span>
+          </div>
+        </div>
+
+        <div class="milestone-label" style="margin-top:1rem;"><i class="fas fa-crown"></i> Beneficios permanentes (de por vida)</div>
+        <div class="chips-row">
+          <span class="reward-chip">200 pts → 2×1 bebidas L-V 3-5pm</span>
+          <span class="reward-chip">500 pts → 10% off permanente</span>
+          <span class="reward-chip">600 pts → Mesa VIP buffet</span>
+          <span class="reward-chip">500 pts → Acceso shows en vivo</span>
+        </div>
+
+        <div class="disadvantage">
+          <i class="fas fa-exclamation-triangle"></i>
+          <strong>Consideraciones:</strong> Los beneficios permanentes requieren alcanzar umbrales mínimos (200, 500, 600 pts) y no son inmediatos para nuevos clientes; los puntos canjeables reducen el saldo pero los beneficios permanecen.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- COMPARATIVA RÁPIDA -->
+  <div class="quick-compare fade-up">
+    <div class="compare-title"><i class="fas fa-balance-scale"></i> Comparativa directa</div>
+    <div class="compare-row">
+      <div class="compare-feature">Acumulación</div>
+      <div class="compare-value">Sellos: $1 = 1 sello + acción redes &nbsp;|&nbsp; Puntos: $1 = 1 punto, multiplicador en promos</div>
+    </div>
+    <div class="compare-row">
+      <div class="compare-feature">Recompensas automáticas</div>
+      <div class="compare-value">Sellos: Sello 10 (Ceviche) automático &nbsp;|&nbsp; Puntos: canjes desde 150 pts + beneficios permanentes al cruzar umbral</div>
+    </div>
+    <div class="compare-row">
+      <div class="compare-feature">Beneficios de por vida</div>
+      <div class="compare-value">Puntos: sí (2×1 bebidas, % off, mesa VIP) &nbsp;|&nbsp; Sellos: no, cada ciclo reinicia pero acumulas nueva tarjeta</div>
+    </div>
+    <div class="compare-row">
+      <div class="compare-feature">Recordatorios push</div>
+      <div class="compare-value">Sellos: mensajes de acercamiento + bonus inactividad &nbsp;|&nbsp; Puntos: alertas integradas por Boomerang</div>
+    </div>
+    <div class="compare-row">
+      <div class="compare-feature">Flexibilidad</div>
+      <div class="compare-value">Puntos: canje parcial sin perder beneficios permanentes &nbsp;|&nbsp; Sellos: experiencia tangible, ideal para visitas frecuentes</div>
+    </div>
+  </div>
+
+  <div class="section-divider fade-up"><span>· · ·</span></div>
+
+  <!-- RECORRIDO DORADO -->
+  <div class="section-title fade-up">
+    <p class="section-label">Paso a paso</p>
+    <h2>✨ Recorrido dorado</h2>
+    <p style="color:var(--text-muted); font-size:0.85rem; margin-top:0.5rem;">Haz clic en cada milestone para desglosar</p>
+    <div class="ornament"><span>◆ ◆ ◆</span></div>
+  </div>
+
+  <!-- Inka Gold Accordions -->
+  <div class="journey-section fade-up">
+    <div class="journey-header">
+      <i class="fas fa-stamp"></i>
+      <h3>Inka Gold · Ruta de Sellos</h3>
+    </div>
+    <div class="steps-wrapper">
+      <div class="step-accordion">
+        <div class="step-header"><span>🎁 Sello 1 → Bebida de bienvenida gratis</span><i class="fas fa-chevron-down"></i></div>
+        <div class="step-content">Al completar tu primer sello (mínimo $1 gastado) obtienes chicha morada, limonada de maracuyá o agua mineral. El mesero registra la recompensa manualmente.</div>
+      </div>
+      <div class="step-accordion">
+        <div class="step-header"><span>⭐ Sello 2 → Recompensa por reseña / post</span><i class="fas fa-chevron-down"></i></div>
+        <div class="step-content">El mesero agrega un sello extra si compartes tu experiencia en Google o redes. ¡Fomenta comunidad!</div>
+      </div>
+      <div class="step-accordion">
+        <div class="step-header"><span>🍤 Sello 5 → Entrada gratis (Anticuchos, Causa o Conchitas)</span><i class="fas fa-chevron-down"></i></div>
+        <div class="step-content">Al llegar a 5 sellos, disfruta una entrada a elección. El mesero canjea manualmente la cortesía.</div>
+      </div>
+      <div class="step-accordion">
+        <div class="step-header"><span>🍰 Sello 8 → Postre de la casa gratis</span><i class="fas fa-chevron-down"></i></div>
+        <div class="step-content">Llegaste lejos. Un postre especial endulzará tu experiencia. Recompensa manual.</div>
+      </div>
+      <div class="step-accordion">
+        <div class="step-header"><span>🐟 Sello 10 → Ceviche Clásico gratis (Automático)</span><i class="fas fa-chevron-down"></i></div>
+        <div class="step-content">El sistema reconoce el ciclo completo y aplica la recompensa final: Ceviche Clásico. ¡Celebra!</div>
+      </div>
+    </div>
+    <div class="push-demo">
+      <div class="push-card"><i class="fas fa-envelope-open-text"></i> Sello 4: "¡Solo falta 1 visita para tu entrada gratis!"</div>
+      <div class="push-card"><i class="fas fa-hourglass-half"></i> Sello 7: "1 visita más y el Ceviche Clásico es tuyo"</div>
+      <div class="push-card"><i class="fas fa-heart"></i> 21 días sin visita: "Te extrañamos, 20 puntos bonus te esperan"</div>
+    </div>
+  </div>
+
+  <!-- Inka Points Accordions -->
+  <div class="journey-section fade-up" style="margin-top:2.5rem">
+    <div class="journey-header">
+      <i class="fas fa-star-of-life"></i>
+      <h3>Inka Points · Ruta de Puntos & Beneficios Permanentes</h3>
+    </div>
+    <div class="steps-wrapper">
+      <div class="step-accordion">
+        <div class="step-header"><span>💰 Acumulación dinámica: $1 = 1 punto + multiplicadores</span><i class="fas fa-chevron-down"></i></div>
+        <div class="step-content">Lunch Special (L-V 12-5pm) → 2× puntos. Buffet fin de semana → 3× puntos. Acumula más rápido.</div>
+      </div>
+      <div class="step-accordion">
+        <div class="step-header"><span>🎟️ Canje 150 pts → $5 descuento en tu próxima visita</span><i class="fas fa-chevron-down"></i></div>
+        <div class="step-content">Descuento automático aplicable a toda la cuenta, sin perder tus beneficios permanentes.</div>
+      </div>
+      <div class="step-accordion">
+        <div class="step-header"><span>🏆 Hito 200 pts → 2×1 bebidas (permanente de por vida)</span><i class="fas fa-chevron-down"></i></div>
+        <div class="step-content">Una vez alcanzado, siempre tendrás 2×1 en bebidas de carta, L-V 3-5pm, aunque gastes puntos.</div>
+      </div>
+      <div class="step-accordion">
+        <div class="step-header"><span>💎 Hito 500 pts → 10% off permanente + Acceso a shows en vivo</span><i class="fas fa-chevron-down"></i></div>
+        <div class="step-content">Descuento global de por vida y entradas a noches especiales. El beneficio no se pierde al canjear.</div>
+      </div>
+      <div class="step-accordion">
+        <div class="step-header"><span>👑 Hito 600 pts → Mesa VIP en buffet sin espera</span><i class="fas fa-chevron-down"></i></div>
+        <div class="step-content">Prioridad en el buffet los fines de semana (con reserva). Estatus premium garantizado.</div>
+      </div>
+      <div class="step-accordion">
+        <div class="step-header"><span>🍽️ Canje 900 pts → Buffet gratis para 1 persona</span><i class="fas fa-chevron-down"></i></div>
+        <div class="step-content">Celebra con el mejor buffet de fin de semana, canjea tus puntos fácilmente.</div>
+      </div>
+    </div>
+    <div class="push-demo">
+      <div class="push-card"><i class="fas fa-chart-line"></i> Al llegar a 190 pts: "¡Estás a 10 puntos del 2×1 permanente!"</div>
+      <div class="push-card"><i class="fas fa-champagne-glasses"></i> Al cruzar 500 pts: "🎉 10% off de por vida activado"</div>
+    </div>
+  </div>
+
+  <div class="section-divider fade-up"><span>· · ·</span></div>
+
+  <!-- CTA -->
+  <div class="cta-section fade-up">
+    <h3>Vive la experiencia <em>dorada</em></h3>
+    <p>Elige tu programa favorito y prueba tu Loyalty Card ahora</p>
+    <div class="cta-buttons">
+      <a href="https://take.cards/ikACb" target="_blank" class="btn-gold">
+        <i class="fas fa-stamp"></i> Probar Inka Gold (Sellos)
+      </a>
+      <a href="https://take.cards/mrZBA" target="_blank" class="btn-gold">
+        <i class="fas fa-coins"></i> Probar Inka Points
+      </a>
+    </div>
+    <p class="cta-note">Simula acumulación, canjes y beneficios permanentes.</p>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="fade-up">
+    <div class="footer-brand"><em>Ceviche Inka</em> Miami</div>
+    <div class="footer-sub">Negro &amp; Dorado · Beneficios únicos para cada estilo</div>
+  </footer>
+
+</div><!-- /container -->
+
+<script>
+  // Accordions
+  document.querySelectorAll('.step-accordion').forEach(acc => {
+    acc.querySelector('.step-header').addEventListener('click', () => {
+      acc.classList.toggle('active');
+    });
+  });
+
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('revealed');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -20px 0px' });
+
+  document.querySelectorAll('.fade-up').forEach(el => {
+    if (el.getBoundingClientRect().top < window.innerHeight - 80) {
+      el.classList.add('revealed');
+    } else {
+      observer.observe(el);
+    }
+  });
+</script>
+</body>
+</html>
